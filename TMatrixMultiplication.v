@@ -1,6 +1,5 @@
 module TMatrixMultiplication;
 reg [255:0] dataInBus;
-reg slapOff;
 
 wire [255:0] dataOut;
  
@@ -9,12 +8,10 @@ reg [16:0] matPrayer[3:0][3:0];
 reg [16:0] matFloor[3:0][3:0];
 reg [255:0] matYew_1;
 reg [255:0] matPhew_2;
-reg [255:0] countMan;
-reg [255:0] countDude;
-reg [4:0] i;
-reg [4:0] j;
 
-MatrixMultiplication bluePill(dataOut, dataInBus, slapOff);
+integer i, j;
+
+MatrixMultiplication bluePill(dataOut, dataInBus);
 
 initial
 begin
@@ -52,15 +49,12 @@ begin
     matPrayer[3][2] = 5;
     matPrayer[3][3] = 7;
     
-    countMan = 0;
-    
     for(i = 0; i<4; i=i+1)
     begin
         for(j = 0; j<4; j=j+1)
         begin
-            matYew_1[countMan+:16] = matExcersize[i][j];
-            matPhew_2[countMan+:16] = matPrayer[i][j];
-            countMan = countMan + 16;
+            matYew_1[i*64+16*j+:16] = matExcersize[i][j];
+            matPhew_2[i*64+16*j+:16] = matPrayer[i][j];
         end
     end
     
@@ -71,15 +65,7 @@ end
 
 always @ dataOut
 begin
-        countDude = 0;
-     #1 for(i = 0; i < 4; i = i + 1)
-        begin
-            for (j = 0; j < 4; j = j + 1)
-            begin
-                matFloor[j][i] <= dataInBus[countDude+:16];
-                countDude = countDude + 16;
-            end
-        end
+    $displayh("%p", dataOut);
 end
 
 
@@ -101,6 +87,14 @@ mat 2
 12             10             15             14
 
 1              3              5              7
+
+expected output
+213         	238         	264         	270
+195	            217         	282         	281
+147	            178         	204         	210
+208	            245	            302	            309
+
+{'{309, 302, 245, 208}, '{210, 204, 178, 147}, '{281, 282, 217, 195}, '{270, 264, 238, 213}}
 */
 
 endmodule
